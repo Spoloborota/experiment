@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social-network-deployment
+  labels:
+    app: social-network
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: social-network
+  template:
+    metadata:
+      labels:
+        app: social-network
+    spec:
+      containers:
+        - name: social-network
+          image: yourusername/social_network:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: social-network-config
+                  key: db_host
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: social-network-config
+                  key: db_port
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: social-network-secret
+                  key: db_user
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: social-network-secret
+                  key: db_password
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: social-network-config
+                  key: db_name
