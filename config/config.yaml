@@ -1,5 +1,0 @@
-db:
-  user: "user"
-  password: "password"
-  name: "social_network"
-  host: "db"

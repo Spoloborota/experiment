@@ -1,44 +1,72 @@
-# Go parameters
-GOCMD = go
-GOBUILD = $(GOCMD) build
-GOTEST = $(GOCMD) test
-GOGET = $(GOCMD) get
-GOTIDY = $(GOCMD) mod tidy
-BINARY_NAME = social_network
-MAIN = cmd/server/main.go
+.PHONY: build run test clean sqlc swagger deps migrate migrate-create migrate-down migrate-status migrate-reset migrate-version
 
-# Docker parameters
-DOCKER = docker
-DOCKER_BUILD = $(DOCKER) build
-DOCKER_RUN = $(DOCKER) run
-DOCKER_IMAGE = social_network:latest
-
-# Commands
-all: test build
-
+# Сборка проекта
 build:
-	$(GOTIDY)
-	$(GOBUILD) -o $(BINARY_NAME) $(MAIN)
+	go build -o bin/server cmd/server/main.go
 
-test:
-	$(GOTEST) -v ./...
-
+# Запуск приложения
 run:
-	$(GOTIDY)
-	$(GOBUILD) -o $(BINARY_NAME) $(MAIN)
-	./$(BINARY_NAME)
+	go run cmd/server/main.go
 
-clean:
-	$(GOCMD) clean
-	rm -f $(BINARY_NAME)
+# Установка зависимостей
+deps:
+	go mod download
+	go mod tidy
 
-docker-build:
-	$(DOCKER_BUILD) -t $(DOCKER_IMAGE) .
+# Генерация sqlc кода
+sqlc:
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@latest generate
 
-docker-run:
-	$(DOCKER_RUN) -p 8080:8080 $(DOCKER_IMAGE)
-
+# Генерация swagger документации
 swagger:
-	swag init -g cmd/server/main.go -o docs
+	go install github.com/swaggo/swag/cmd/swag@latest
+	swag init -g cmd/server/main.go
 
-.PHONY: all build test clean run docker-build docker-run swagger
+# Очистка сгенерированных файлов
+clean:
+	rm -rf bin/
+	rm -rf docs/swagger.json docs/swagger.yaml
+
+# Запуск тестов
+test:
+	go test -v ./...
+
+# Применение миграций с goose
+migrate:
+	@echo "Применение миграций с goose..."
+	go run cmd/migrations/main.go up
+
+# Создание новой миграции
+migrate-create:
+	@if [ -z "$(name)" ]; then \
+		echo "Usage: make migrate-create name=migration_name"; \
+		exit 1; \
+	fi
+	go run cmd/migrations/main.go create $(name)
+
+# Откат последней миграции
+migrate-down:
+	go run cmd/migrations/main.go down
+
+# Статус миграций
+migrate-status:
+	go run cmd/migrations/main.go status
+
+# Сброс всех миграций
+migrate-reset:
+	go run cmd/migrations/main.go reset
+
+# Версия базы данных
+migrate-version:
+	go run cmd/migrations/main.go version
+
+# Полная перегенерация
+regen: clean sqlc swagger
+
+# Быстрый старт для разработки
+dev: deps regen build
+	@echo "Проект готов к запуску!"
+	@echo "1. Настройте .env файл"
+	@echo "2. Запустите PostgreSQL (docker-compose up -d)"
+	@echo "3. Примените миграции: make migrate"
+	@echo "4. Запустите сервер: make run" 
