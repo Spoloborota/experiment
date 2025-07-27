@@ -135,7 +135,7 @@ curl "http://localhost:8080/api/v1/profiles?gender=male&city=Москва&intere
 │   └── migrations/      # Команда для управления миграциями
 ├── internal/
 │   ├── config/          # Конфигурация
-│   ├── domain/          # Доменный слой
+│   ├── domain/          # Доменный слой (DDD)
 │   │   ├── entities/    # Доменные сущности
 │   │   ├── repositories/# Интерфейсы репозиториев
 │   │   └── services/    # Доменные сервисы
@@ -165,10 +165,10 @@ curl "http://localhost:8080/api/v1/profiles?gender=male&city=Москва&intere
 
 Проект построен на принципах **Clean Architecture** и **Domain Driven Design (DDD)**:
 
-- **Domain Layer** - Бизнес-логика и правила
-- **Infrastructure Layer** - Внешние зависимости (БД, внешние API)
-- **Interface Layer** - HTTP handlers и роуты
-- **Application Layer** - Координация между слоями
+- **Domain Layer** (`internal/domain/`) - Бизнес-логика, сущности и интерфейсы репозиториев
+- **Infrastructure Layer** (`internal/infrastructure/`) - Внешние зависимости (БД, реализация репозиториев)  
+- **Interface Layer** (`internal/interfaces/`) - HTTP handlers, middleware и роуты
+- **Configuration** (`internal/config/`) - Настройки приложения с поддержкой env переменных
 
 ## Управление миграциями
 

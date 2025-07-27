@@ -6,6 +6,7 @@ package sqlc
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Profile struct {
@@ -17,14 +18,14 @@ type Profile struct {
 	Gender    sql.NullString `db:"gender" json:"gender"`
 	City      sql.NullString `db:"city" json:"city"`
 	Interests []string       `db:"interests" json:"interests"`
-	CreatedAt sql.NullTime   `db:"created_at" json:"created_at"`
-	UpdatedAt sql.NullTime   `db:"updated_at" json:"updated_at"`
+	CreatedAt time.Time      `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time      `db:"updated_at" json:"updated_at"`
 }
 
 type User struct {
-	ID           int32        `db:"id" json:"id"`
-	Email        string       `db:"email" json:"email"`
-	PasswordHash string       `db:"password_hash" json:"password_hash"`
-	CreatedAt    sql.NullTime `db:"created_at" json:"created_at"`
-	UpdatedAt    sql.NullTime `db:"updated_at" json:"updated_at"`
+	ID           int32     `db:"id" json:"id"`
+	Email        string    `db:"email" json:"email"`
+	PasswordHash string    `db:"password_hash" json:"password_hash"`
+	CreatedAt    time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }

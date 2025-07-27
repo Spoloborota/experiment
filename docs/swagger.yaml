@@ -1,0 +1,304 @@
+basePath: /api/v1
+definitions:
+  internal_interfaces_http_handlers.AuthResponse:
+    properties:
+      token:
+        type: string
+      user: {}
+    type: object
+  internal_interfaces_http_handlers.CreateProfileRequest:
+    properties:
+      age:
+        type: integer
+      city:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      interests:
+        items:
+          type: string
+        type: array
+      last_name:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.ProfilesResponse:
+    properties:
+      limit:
+        type: integer
+      offset:
+        type: integer
+      profiles:
+        items: {}
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_interfaces_http_handlers.RegisterRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_interfaces_http_handlers.UpdateProfileRequest:
+    properties:
+      age:
+        type: integer
+      city:
+        type: string
+      first_name:
+        type: string
+      gender:
+        type: string
+      interests:
+        items:
+          type: string
+        type: array
+      last_name:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API для социальной сети с регистрацией и просмотром анкет
+  title: Social Network API
+  version: "1.0"
+paths:
+  /api/v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Авторизует пользователя и возвращает JWT токен
+      parameters:
+      - description: Данные для авторизации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      summary: Авторизация пользователя
+      tags:
+      - auth
+  /api/v1/profile:
+    post:
+      consumes:
+      - application/json
+      description: Создает профиль для текущего пользователя
+      parameters:
+      - description: Данные профиля
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.CreateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Создание профиля
+      tags:
+      - profiles
+  /api/v1/profile/{id}:
+    get:
+      description: Возвращает профиль пользователя по его ID
+      parameters:
+      - description: ID профиля
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      summary: Получение профиля по ID
+      tags:
+      - profiles
+  /api/v1/profile/me:
+    get:
+      description: Возвращает профиль текущего авторизованного пользователя
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Получение собственного профиля
+      tags:
+      - profiles
+    put:
+      consumes:
+      - application/json
+      description: Обновляет профиль текущего пользователя
+      parameters:
+      - description: Данные для обновления профиля
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Обновление профиля
+      tags:
+      - profiles
+  /api/v1/profiles:
+    get:
+      description: Ищет профили по заданным фильтрам
+      parameters:
+      - description: Фильтр по полу
+        in: query
+        name: gender
+        type: string
+      - description: Фильтр по городу
+        in: query
+        name: city
+        type: string
+      - description: Фильтр по интересам (через запятую)
+        in: query
+        name: interests
+        type: string
+      - default: 10
+        description: Лимит результатов
+        in: query
+        name: limit
+        type: integer
+      - default: 0
+        description: Смещение
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ProfilesResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      summary: Поиск профилей
+      tags:
+      - profiles
+  /api/v1/register:
+    post:
+      consumes:
+      - application/json
+      description: Создает нового пользователя в системе
+      parameters:
+      - description: Данные для регистрации
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_interfaces_http_handlers.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.AuthResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/internal_interfaces_http_handlers.ErrorResponse'
+      summary: Регистрация пользователя
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    description: Введите 'Bearer {токен}' для авторизации
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

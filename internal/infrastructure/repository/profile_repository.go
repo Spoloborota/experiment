@@ -181,7 +181,7 @@ func (r *profileRepository) convertToEntity(sqlcProfile sqlc.Profile) *entities.
 		Gender:    gender,
 		City:      city,
 		Interests: interests,
-		CreatedAt: sqlcProfile.CreatedAt.Time,
-		UpdatedAt: sqlcProfile.UpdatedAt.Time,
+		CreatedAt: sqlcProfile.CreatedAt,
+		UpdatedAt: sqlcProfile.UpdatedAt,
 	}
 }

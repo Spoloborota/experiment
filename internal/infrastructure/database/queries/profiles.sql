@@ -13,7 +13,7 @@ WHERE user_id = $1;
 
 -- name: UpdateProfile :one
 UPDATE profiles 
-SET first_name = $2, last_name = $3, age = $4, gender = $5, city = $6, interests = $7
+SET first_name = $2, last_name = $3, age = $4, gender = $5, city = $6, interests = $7, updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1
 RETURNING *;
 

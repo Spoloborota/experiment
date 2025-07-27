@@ -181,7 +181,7 @@ func (q *Queries) SearchProfiles(ctx context.Context, arg SearchProfilesParams) 
 
 const updateProfile = `-- name: UpdateProfile :one
 UPDATE profiles 
-SET first_name = $2, last_name = $3, age = $4, gender = $5, city = $6, interests = $7
+SET first_name = $2, last_name = $3, age = $4, gender = $5, city = $6, interests = $7, updated_at = CURRENT_TIMESTAMP
 WHERE user_id = $1
 RETURNING id, user_id, first_name, last_name, age, gender, city, interests, created_at, updated_at
 `

@@ -19,8 +19,7 @@ sqlc:
 
 # Генерация swagger документации
 swagger:
-	go install github.com/swaggo/swag/cmd/swag@latest
-	swag init -g cmd/server/main.go
+	go run github.com/swaggo/swag/cmd/swag@latest init -g cmd/server/main.go --parseDependency --parseInternal
 
 # Очистка сгенерированных файлов
 clean:

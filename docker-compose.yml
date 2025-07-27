@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:17-alpine3.22
@@ -9,14 +7,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: social_network
     ports:
-      - "5432:5432"
+      - "6632:5432"
     volumes:
-      - data/postgresql:/var/lib/postgresql/data
+      - ./data/postgresql:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
-
-volumes:
-  postgres_data: 

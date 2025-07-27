@@ -68,7 +68,7 @@ func (r *userRepository) convertToEntity(sqlcUser sqlc.User) *entities.User {
 		ID:           int(sqlcUser.ID),
 		Email:        sqlcUser.Email,
 		PasswordHash: sqlcUser.PasswordHash,
-		CreatedAt:    sqlcUser.CreatedAt.Time,
-		UpdatedAt:    sqlcUser.UpdatedAt.Time,
+		CreatedAt:    sqlcUser.CreatedAt,
+		UpdatedAt:    sqlcUser.UpdatedAt,
 	}
 }

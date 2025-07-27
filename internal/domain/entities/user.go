@@ -46,3 +46,8 @@ func validateEmail(email string) error {
 
 	return nil
 }
+
+// TouchUpdatedAt обновляет время последнего изменения
+func (u *User) TouchUpdatedAt() {
+	u.UpdatedAt = time.Now()
+}
