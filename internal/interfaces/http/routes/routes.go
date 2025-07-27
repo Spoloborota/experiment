@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -52,8 +54,22 @@ func (rt *Routes) Setup() *chi.Mux {
 	authHandler := handlers.NewAuthHandler(rt.authService, rt.logger)
 	profileHandler := handlers.NewProfileHandler(rt.profileService, rt.logger)
 
+	// Health check endpoint
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok","service":"social-network"}`))
+	})
+
 	// API routes
 	r.Route("/api/v1", func(r chi.Router) {
+		// Health check for API
+		r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(`{"status":"ok","service":"social-network-api"}`))
+		})
+
 		// Публичные роуты (без авторизации)
 		r.Post("/register", authHandler.Register)
 		r.Post("/login", authHandler.Login)

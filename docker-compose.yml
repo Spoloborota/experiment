@@ -15,3 +15,101 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  # Prod версия сервера
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: social_network_server
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_HOST=0.0.0.0
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=social_network
+      - DB_SSLMODE=disable
+      - JWT_SECRET=docker-development-secret-key-change-in-production
+      - JWT_EXPIRY_HOURS=24
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Debug версия сервера с Delve
+  server-debug:
+    build:
+      context: .
+      dockerfile: Dockerfile.debug
+    container_name: social_network_server_debug
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_HOST=0.0.0.0
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=social_network
+      - DB_SSLMODE=disable
+      - JWT_SECRET=docker-development-secret-key-change-in-production
+      - JWT_EXPIRY_HOURS=24
+    ports:
+      - "8081:8080"  # HTTP порт для debug версии
+      - "2345:2345"  # Delve дебаггер порт
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app  # Монтируем исходный код для live reload
+    profiles:
+      - debug  # Запускается только при явном указании профиля debug
+
+  # Миграции
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
+    container_name: social_network_migrations
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=social_network
+      - DB_SSLMODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Дополнительный контейнер для выполнения миграций вручную
+  migrations-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile.migrations
+    container_name: social_network_migrations_cli
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=social_network
+      - DB_SSLMODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - tools  # Запускается только при явном указании профиля tools
+    command: ["sleep", "infinity"]  # Ждет команд
