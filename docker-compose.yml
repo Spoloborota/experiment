@@ -20,7 +20,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile.server
+      dockerfile: docker/server.dockerfile
     container_name: social_network_server
     environment:
       - SERVER_PORT=8080
@@ -51,7 +51,7 @@ services:
   server-debug:
     build:
       context: .
-      dockerfile: Dockerfile.debug
+      dockerfile: docker/debug.dockerfile
     container_name: social_network_server_debug
     environment:
       - SERVER_PORT=8080
@@ -81,7 +81,7 @@ services:
   migrations:
     build:
       context: .
-      dockerfile: Dockerfile.migrations
+      dockerfile: docker/migrations.dockerfile
     container_name: social_network_migrations
     environment:
       - DB_HOST=postgres
@@ -98,7 +98,7 @@ services:
   migrations-cli:
     build:
       context: .
-      dockerfile: Dockerfile.migrations
+      dockerfile: docker/migrations.dockerfile
     container_name: social_network_migrations_cli
     environment:
       - DB_HOST=postgres

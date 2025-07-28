@@ -54,9 +54,6 @@ COPY --from=builder --chown=appuser:appuser /app/docs ./docs
 # Открываем порт для приложения
 EXPOSE 8080
 
-# Открываем порт для дебаггера (Delve)
-EXPOSE 2345
-
 # Устанавливаем переменные среды по умолчанию
 ENV SERVER_PORT=8080
 ENV SERVER_HOST=0.0.0.0
